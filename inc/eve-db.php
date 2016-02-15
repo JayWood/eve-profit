@@ -19,4 +19,15 @@ class Eve_DB {
 		$results = $this->db->get_var( $sql );
 		return $results;
 	}
+
+	public function get_item_data( $item_id ) {
+		$sql = $this->db->prepare( '
+			SELECT i.typeID, i.typeName, i.description, g.groupName FROM invTypes i
+			INNER JOIN invGroups g
+			ON g.groupID = i.groupID
+			WHERE i.typeID = %d
+		', $item_id );
+
+		return $this->db->get_row( $sql );
+	}
 }

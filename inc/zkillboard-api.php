@@ -9,7 +9,7 @@ class ZKillboard {
 	 * @param int|array $ids
 	 * @param array     $params
 	 *
-	 * @return string|WP_Error
+	 * @return Object|WP_Error
 	 */
 	public function get_losses_by( $type, $ids, $params = array() ) {
 		return $this->get_type( 'losses', $type, $ids, $params );
@@ -110,6 +110,6 @@ class ZKillboard {
 
 		$url = $this->end_point . $type . '/' . $fetch . '/' . $ids . $url_params;
 
-		return $this->make_request( $url );
+		return json_decode( $this->make_request( $url ) );
 	}
 }
