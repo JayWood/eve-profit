@@ -47,9 +47,24 @@ class Eve_Kill {
 		}
 
 		$region_id = $this->db->get_region_id( 'The Bleak Lands' );
-		$losses = $this->zkill->get_losses_by( 'region', $region_id, array(
-			'limit' => 10,
-		) );
+
+		$params = array(
+//			'limit' => 10,
+		);
+
+		$after_id = $this->db->get_last_id();
+
+		if ( ! empty( $after_id ) ) {
+			$params['afterKillID'] = $after_id;
+		}
+
+
+		$losses = $this->zkill->get_losses_by( 'region', $region_id, $params );
+
+		if ( empty( $losses ) ) {
+			error_log( 'No losses' );
+			return;
+		}
 
 		foreach ( $losses as $loss ) {
 

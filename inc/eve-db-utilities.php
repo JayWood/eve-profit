@@ -223,7 +223,7 @@ class Eve_DB_Utils extends Eve_DB {
 			'killTIme'      => strtotime( $timestamp ),
 			'victim'        => intval( $zkill->get_victim( $loss, 'characterID' ) ),
 			'aggressors'    => maybe_serialize( $aggressors ),
-		) );
+		), array( '%d', '%d', '%d', '%d', '%s' )  );
 	}
 
 	/**
@@ -258,6 +258,17 @@ class Eve_DB_Utils extends Eve_DB {
 			'dropped'   => $item['qtyDropped'],
 		);
 
-		return $wpdb->insert( $this->items, $insert );
+		return $wpdb->insert( $this->items, $insert, array( '%d', '%d', '%d', '%d' ) );
+	}
+
+	/**
+	 * Gets the last ID that was added.
+	 * @return null|string
+	 */
+	public function get_last_id() {
+		global $wpdb;
+
+		return $wpdb->get_var( "SELECT killID from {$this->losses} ORDER BY killTime DESC LIMIT 1" );
+
 	}
 }
