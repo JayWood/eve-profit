@@ -11,7 +11,9 @@
 // A library for reading zkillboard data
 
 require_once 'inc/eve-db.php';
+require_once 'inc/eve-db-utilities.php';
 require_once 'inc/zkillboard-api.php';
+
 class Eve_Kill {
 
 	protected static $instance;
@@ -21,8 +23,8 @@ class Eve_Kill {
 	private $systems = array();
 
 	protected function __construct() {
-		$this->db = new Eve_DB();
 		$this->zkill = new zKillboard();
+		$this->db = new Eve_DB_Utils( $this );
 	}
 
 	public static function init() {
@@ -35,6 +37,8 @@ class Eve_Kill {
 
 	public function hooks() {
 		add_action( 'template_redirect', array( $this, 'override' ) );
+
+		$this->db->hooks();
 	}
 
 	public function override() {
@@ -48,34 +52,9 @@ class Eve_Kill {
 		) );
 
 		foreach ( $losses as $loss ) {
-			$this->increment_item( $loss->victim->shipTypeID );
-			$this->increment_system( $loss->solarSystemID );
-			foreach ( $loss->items as $_key => $_val ) {
-				$this->increment_item( $loss->items[ $_key ]->typeID );
-			}
-		}
 
-		foreach ( $this->items as $item_id => $count ) {
-			$item_data = $this->db->get_item_data( $item_id );
-			error_log( sprintf( 'x%d - %s', $count, $item_data->typeName ) );
-		}
-	}
+			$this->db->insert_loss( $loss );
 
-	public function increment_system( $system_id ) {
-		$systems = $this->systems;
-		if ( array_key_exists( $system_id, $systems ) ) {
-			$systems[ $system_id ]++;
-		} else {
-			$this->systems[ $system_id ] = 1;
-		}
-	}
-
-	public function increment_item( $item ) {
-		$items = $this->items;
-		if ( array_key_exists( $item, $items ) ) {
-			$items[ $item ]++;
-		} else {
-			$this->items[ $item ] = 1;
 		}
 	}
 }
