@@ -15,6 +15,43 @@ class Eve_DB_Utils extends Eve_DB {
 		parent::__construct( $plugin );
 	}
 
+	public function market_group_has_children( $groupID ) {
+		$sql = $this->db->prepare( 'SELECT COUNT(*) FROM invMarketGroups where parentGroupID = %d', $groupID );
+		$result = $this->db->get_var( $sql );
+		return $result > 0 ? true : false;
+	}
+
+	/**
+	 * Gets all market groups by parent.
+	 * @param int $parent
+	 *
+	 * @return array|null|object
+	 */
+	public function get_market_group_by_parent( $parent ) {
+		$sql = $this->db->prepare( 'SELECT * FROM invMarketGroups WHERE parentGroupID = %d', $parent );
+		return $this->db->get_results( $sql );
+	}
+
+	/**
+	 * Gets a market group by name.
+	 *
+	 * @param string $name
+	 *
+	 * @return array|null|object
+	 */
+	public function get_market_group_by_name( $name ) {
+		$sql = $this->db->prepare( 'SELECT * FROM invMarketGroups WHERE marketGroupName = %s LIMIT 1', $name );
+		return $this->db->get_row( $sql );
+	}
+
+	/**
+	 * Gets a list of all TOP-level market groups
+	 * @return array|null|object
+	 */
+	public function get_all_parent_market_groups() {
+		return $this->db->get_results( 'SELECT * FROM invMarketGroups where parentGroupID IS NULL' );
+	}
+
 	/**
 	 * Gets the region ID for a solar system
 	 *
