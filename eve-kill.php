@@ -55,10 +55,41 @@ class Eve_Kill {
 		$this->db->hooks();
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue' ) );
+
+		add_action( 'wp_ajax_items_for_group', array( $this, 'get_items_for_market_group' ) );
+		add_action( 'wp_ajax_nopriv_items_for_group', array( $this, 'get_items_for_market_group' ) );
+	}
+
+	public function get_items_for_market_group() {
+		$group_id = intval( $_REQUEST['group'] );
+
+		if ( empty( $group_id ) ) {
+			wp_send_json_error( $_POST );
+		}
+
+		$items = $this->db->get_items_by_market_group( $group_id );
+		if ( empty( $items ) ) {
+			wp_send_json_error( 'No Items' );
+		}
+
+		$output = '<ul class="items">';
+		foreach ( $items as $item ) {
+			$output .= '<li class="eve-item item-'. $item->typeID .'" data-typeID="'. $item->typeID .'" data-tip="'.$item->description.'" data-iconID="'.$item->iconID.'" data-graphicID="'.$item->graphicID.'">'.$item->typeName.'</li>';
+		}
+		$output .= '</ul>';
+
+		wp_send_json_success( $output );
+
 	}
 
 	public function enqueue() {
-		wp_enqueue_script( 'eve-kill', $this->url( 'assets/eve-kill.js' ), array( 'jquery' ), self::VERSION, true );
+
+		wp_register_script( 'eve-kill', $this->url( 'assets/eve-kill.js' ), array( 'jquery' ), self::VERSION, true );
+		wp_localize_script( 'eve-kill', 'ek_l10n', array(
+			'ajaxurl' => admin_url( 'admin-ajax.php' ),
+		) );
+
+		wp_enqueue_script( 'eve-kill' );
 		wp_enqueue_style( 'eve-kill', $this->url( 'assets/eve-kill.css' ), false, self::VERSION );
 	}
 

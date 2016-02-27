@@ -39,7 +39,8 @@ function ek_market_tree_children( $parent_id ) {
 	if ( ! empty( $market_groups ) ) {
 		$output .= '<ul class="market-groups child">';
 		foreach ( $market_groups as $market_group ) {
-			$output .= sprintf( '<li class="group-id-%1$s market-group" data-tip="%2$s"><span class="group-name">%3$s</span>', $market_group->marketGroupID, $market_group->description, $market_group->marketGroupName );
+			$has_types = ! empty( $market_group->hasTypes ) ? true : false;
+			$output .= sprintf( '<li class="group-id-%1$s market-group" data-groupID="%1$s" data-tip="%2$s" data-has-types="%3$s"><div class="group-name">%4$s</div>', $market_group->marketGroupID, $market_group->description, $has_types, $market_group->marketGroupName );
 			if ( $ek->db->market_group_has_children( $market_group->marketGroupID ) ) {
 				$output .= ek_market_tree_children( $market_group->marketGroupID );
 			}
@@ -67,7 +68,7 @@ function ek_market_tree() {
 		if ( ! empty( $parents ) ) {
 			$output .= '<ul class="market-groups">';
 			foreach ( $parents as $market_group ) {
-				$output .= sprintf( '<li class="group-id-%1$s market-group" data-tip="%2$s"><span class="group-name">%3$s</span>', $market_group->marketGroupID, $market_group->description, $market_group->marketGroupName );
+				$output .= sprintf( '<li class="group-id-%1$s market-group" data-tip="%2$s"><div class="group-name">%3$s</div>', $market_group->marketGroupID, $market_group->description, $market_group->marketGroupName );
 				$output .= ek_market_tree_children( $market_group->marketGroupID );
 				$output .= '</li>';
 			}

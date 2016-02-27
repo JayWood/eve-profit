@@ -120,6 +120,11 @@ class Eve_DB_Utils extends Eve_DB {
 		return $this->db->get_row( $sql );
 	}
 
+	public function get_items_by_market_group( $parent_id ) {
+		$sql = $this->db->prepare( 'SELECT * FROM invTypes WHERE marketGroupID = %d AND published = 1', $parent_id );
+		return $this->db->get_results( $sql );
+	}
+
 	/**
 	 * Inserts a loss into the database.
 	 *

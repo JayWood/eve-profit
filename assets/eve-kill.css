@@ -1,18 +1,44 @@
-ul.market-groups{
+ul.market-groups, ul.items{
     list-style: none;
-    background-color: rgba( 0,0,0,0.25 );
+    margin: 0;
+    padding: 0;
 }
 
-ul.market-groups span{
-    display: block;
-    padding: 5px;
+ul.market-groups li {
     cursor: pointer;
 }
 
-ul.market-groups span:hover {
-    background-color: rgba( 0,0,0,0.25 );
+ul.market-groups li > ul {
+    margin: 0;
+    padding-left: 1em;
+}
+
+ul.market-groups > li div {
+    padding: 0.25em;
+    background-color: #727272;
+    border: 1px solid black;
+    border-bottom: none;
+    color: white;
+}
+
+ul.market-groups.child > li div {
+    background-color: transparent;
+    border: none;
+    color: black;
 }
 
 ul.market-groups.child {
     display:none;
+}
+
+ul.market-groups li div:hover, ul.items li:hover{
+    background-color: #999;
+}
+
+li.eve-item.selected:hover{
+    background-color: lightyellow;
+}
+
+li.eve-item.selected{
+    background-color: yellow;
 }
