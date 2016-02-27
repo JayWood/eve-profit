@@ -20,13 +20,23 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 
 class Eve_Kill {
 
+	const VERSION = '0.1.0';
+
 	protected static $instance;
 
 	private $items = array();
 
 	private $systems = array();
 
+	public $basename, $url, $path;
+
 	protected function __construct() {
+
+		$this->basename = plugin_basename( __FILE__ );
+		$this->url      = plugin_dir_url( __FILE__ );
+		$this->path     = plugin_dir_path( __FILE__ );
+
+
 		$this->zkill = new zKillboard();
 		$this->db = new Eve_DB_Utils( $this );
 		
@@ -43,6 +53,13 @@ class Eve_Kill {
 
 	public function hooks() {
 		$this->db->hooks();
+
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue' ) );
+	}
+
+	public function enqueue() {
+		wp_enqueue_script( 'eve-kill', $this->url( 'assets/eve-kill.js' ), array( 'jquery' ), self::VERSION, true );
+		wp_enqueue_style( 'eve-kill', $this->url( 'assets/eve-kill.css' ), false, self::VERSION );
 	}
 
 	public function shortcodes() {
@@ -58,6 +75,56 @@ class Eve_Kill {
 	public function render_view( $view ) {
 		require_once 'inc/template-tags.php';
 		include "views/$view.php";
+	}
+
+
+	/**
+	 * Include a file from the includes directory
+	 *
+	 * @since  0.1.0
+	 * @param  string  $filename Name of the file to be included
+	 * @return bool    Result of include call.
+	 */
+	public static function include_file( $filename ) {
+		$file = self::dir( 'includes/'. $filename .'.php' );
+		if ( file_exists( $file ) ) {
+			return include_once( $file );
+		}
+		return false;
+	}
+
+	public static function views( $filename ) {
+		$file = self::dir( 'views/'. $filename .'.php' );
+		if ( file_exists( $file ) ) {
+			return include_once( $file );
+		}
+		return false;
+	}
+
+	/**
+	 * This plugin's directory
+	 *
+	 * @since  0.1.0
+	 * @param  string $path (optional) appended path
+	 * @return string       Directory and path
+	 */
+	public static function dir( $path = '' ) {
+		static $dir;
+		$dir = $dir ? $dir : trailingslashit( dirname( __FILE__ ) );
+		return $dir . $path;
+	}
+
+	/**
+	 * This plugin's url
+	 *
+	 * @since  0.1.0
+	 * @param  string $path (optional) appended path
+	 * @return string       URL and path
+	 */
+	public static function url( $path = '' ) {
+		static $url;
+		$url = $url ? $url : trailingslashit( plugin_dir_url( __FILE__ ) );
+		return $url . $path;
 	}
 }
 
