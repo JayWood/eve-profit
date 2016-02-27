@@ -9,7 +9,7 @@ class ZKillboard {
 	 * @param int|array $ids
 	 * @param array     $params
 	 *
-	 * @return Object|WP_Error
+	 * @return array|WP_Error
 	 */
 	public function get_losses_by( $type, $ids, $params = array() ) {
 		return $this->_get_type( 'losses', $type, $ids, $params );
@@ -58,8 +58,17 @@ class ZKillboard {
 
 		$url  = esc_url( $url );
 		$hash = md5( $url );
+		$body = get_transient( $hash );
 
-		if ( false === $body = get_transient( $hash ) ) {
+		error_log( sprintf( '[%s] - %s', current_time( 'Y-m-d h:i A' ), $url ) );
+
+		// Cache buster
+		if ( strpos( $url, 'nocache' ) ) {
+			$url = str_replace( '/nocache/1', '', $url );
+			$body = false;
+		}
+
+		if ( false === $body ) {
 			$remote_get = wp_safe_remote_get( $url, array(
 				'user-agent' => 'WordPress/Plugish.com - Maintainer: xPhyrax - jjwood2004@gmail.com',
 				'headers'    => array( 'Accept-Encoding: gzip' ),
@@ -70,7 +79,7 @@ class ZKillboard {
 			}
 
 			$body = wp_remote_retrieve_body( $remote_get );
-			set_transient( $hash, $body, 30 * HOUR_IN_SECONDS );
+			set_transient( $hash, $body, 30 * 60 );
 		}
 
 		return $body;

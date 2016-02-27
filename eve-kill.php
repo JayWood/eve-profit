@@ -10,9 +10,13 @@
 
 // A library for reading zkillboard data
 
-require_once 'inc/eve-db.php';
-require_once 'inc/eve-db-utilities.php';
-require_once 'inc/zkillboard-api.php';
+require_once 'inc/lib/eve-db.php';
+require_once 'inc/lib/eve-db-utilities.php';
+require_once 'inc/lib/zkillboard-api.php';
+
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	include_once 'cli/import.php';
+}
 
 class Eve_Kill {
 
@@ -25,6 +29,8 @@ class Eve_Kill {
 	protected function __construct() {
 		$this->zkill = new zKillboard();
 		$this->db = new Eve_DB_Utils( $this );
+		
+		$this->shortcodes();
 	}
 
 	public static function init() {
@@ -36,41 +42,22 @@ class Eve_Kill {
 	}
 
 	public function hooks() {
-		add_action( 'template_redirect', array( $this, 'override' ) );
-
 		$this->db->hooks();
 	}
 
-	public function override() {
-		if ( ! isset( $_GET['eve'] ) ) {
-			return;
-		}
+	public function shortcodes() {
+		add_shortcode( 'ek-search-form', array( $this, 'form' ) );
+	}
 
-		$region_id = $this->db->get_region_id( 'The Bleak Lands' );
+	public function form() {
+		ob_start();
+		$this->render_view( 'ek-search-form' );
+		return ob_get_clean();
+	}
 
-		$params = array(
-//			'limit' => 10,
-		);
-
-		$after_id = $this->db->get_last_id();
-
-		if ( ! empty( $after_id ) ) {
-			$params['afterKillID'] = $after_id;
-		}
-
-
-		$losses = $this->zkill->get_losses_by( 'region', $region_id, $params );
-
-		if ( empty( $losses ) ) {
-			error_log( 'No losses' );
-			return;
-		}
-
-		foreach ( $losses as $loss ) {
-
-			$this->db->insert_loss( $loss );
-
-		}
+	public function render_view( $view ) {
+		require_once 'inc/template-tags.php';
+		include "views/$view.php";
 	}
 }
 

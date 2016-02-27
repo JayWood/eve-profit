@@ -34,6 +34,30 @@ class Eve_DB_Utils extends Eve_DB {
 	}
 
 	/**
+	 * Gets region ID and name from database
+	 * @return null|string
+	 */
+	public function get_regions( $format = false ) {
+		$return = $this->db->get_results( 'SELECT regionID,regionName from mapRegions' );
+		if ( empty( $return ) || ! $format ) {
+			return $return;
+		}
+
+		$formatted = array();
+		if ( is_array( $return ) ) {
+			foreach ( $return as $region ) {
+				if ( ! isset( $region->regionID ) || ! isset( $region->regionName ) ) {
+					continue;
+				}
+				$formatted[] = array(
+					$region->regionID => $region->regionName,
+				);
+			}
+		}
+		return $formatted;
+	}
+
+	/**
 	 * Gets the region ID of a specific region
 	 *
 	 * @param String $region_name The name of the region
@@ -97,6 +121,13 @@ class Eve_DB_Utils extends Eve_DB {
 		$this->insert_attacker_items( $loss );
 	}
 
+	/**
+	 * Inserts the attackers items into the DB
+	 * @param $loss
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
 	private function insert_attacker_items( $loss ) {
 		global $wpdb;
 		$zkill = $this->plugin->zkill;
@@ -109,7 +140,7 @@ class Eve_DB_Utils extends Eve_DB {
 
 		foreach( $attackers as $attacker ) {
 
-			if ( ! isset( $attacker->weaponTypeID )
+			if ( ! isset( $attacker->weaponTypeIDonTypeID )
 			     || ! isset( $attacker->shipTypeID )
 			     || empty( $attacker->weaponTypeID )
 			     || empty( $attacker->shipTypeID ) )
@@ -223,7 +254,7 @@ class Eve_DB_Utils extends Eve_DB {
 			'killTIme'      => strtotime( $timestamp ),
 			'victim'        => intval( $zkill->get_victim( $loss, 'characterID' ) ),
 			'aggressors'    => maybe_serialize( $aggressors ),
-		), array( '%d', '%d', '%d', '%d', '%s' )  );
+		), array( '%d', '%d', '%d', '%d', '%d', '%s' )  );
 	}
 
 	/**
