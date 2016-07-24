@@ -20,9 +20,9 @@ class Eve_DB {
 	 */
 	protected $plugin;
 
-	const DB_VERSION = '0.1';
+	const DB_VERSION = '0.2';
 
-	public function __construct( $plugin, $database = 'plugish_eve_sde', $host = 'localhost' ) {
+	public function __construct( $plugin, $database = 'eve', $host = 'localhost' ) {
 
 		$this->plugin = $plugin;
 
@@ -116,6 +116,7 @@ class Eve_DB {
 			itemID INT(11) NOT NULL,
 			destroyed INT(11) NOT NULL DEFAULT 0,
 			dropped INT(11) NOT NULL DEFAULT 0,
+			flag INT(11) NOT NULL DEFAULT 0,
 			UNIQUE KEY id (id)
 		) $charset_collate;";
 		dbDelta( $items_table );

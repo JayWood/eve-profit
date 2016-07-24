@@ -316,6 +316,7 @@ class Eve_DB_Utils extends Eve_DB {
 			'typeID'       => '',
 			'qtyDropped'   => 0,
 			'qtyDestroyed' => 0,
+			'flag'         => 0,
 		);
 
 		$item = wp_parse_args( $item, $defaults );
@@ -329,9 +330,10 @@ class Eve_DB_Utils extends Eve_DB {
 			'itemID'    => $item['typeID'],
 			'destroyed' => $item['qtyDestroyed'],
 			'dropped'   => $item['qtyDropped'],
+			'flag'      => $item['flag'],
 		);
 
-		return $wpdb->insert( $this->items, $insert, array( '%d', '%d', '%d', '%d' ) );
+		return $wpdb->insert( $this->items, $insert, array( '%d', '%d', '%d', '%d', '%d' ) );
 	}
 
 	/**

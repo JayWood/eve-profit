@@ -32,9 +32,12 @@ class EK_CLI_Import extends WP_CLI_Command {
 		}
 
 		$params = array();
-		$after_id = $ek_inst->db->get_last_id();
-		if ( ! empty( $after_id ) ) {
-			$params['afterKillID'] = $after_id;
+
+		if ( ! isset( $assoc_args['nocache'] ) ) {
+			$after_id = $ek_inst->db->get_last_id();
+			if ( ! empty( $after_id ) ) {
+				$params['afterKillID'] = $after_id;
+			}
 		}
 
 		if ( isset( $this->assoc_args['nocache'] ) ) {
